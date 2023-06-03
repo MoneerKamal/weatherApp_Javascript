@@ -13,45 +13,44 @@ const temperature_max_min = document.getElementById("temperature_max_min");
 const _weather = document.getElementById("weather");
 const weather_desc = document.getElementById("weather_desc");
 
+const getWeatherData=(city)=>{
+  fetch(
+    `${api.base}weather?q=${city}&units=metric&appid=${api.key}`
+  )
+    .then((res) => res.json())
+    .then((result) => {
+      weather = { ...result };
+      fill_data(weather);
+
+      console.log(result);
+    });
+};
+
 document.addEventListener("readystatechange", (e) => {
   if (e.target.readyState === "complete") {
     console.log("ready");
-    ready();
-    initApp();
+    firstCall();
+    AddSearchListner();
   }
 });
 
-const initApp = () => {
+const AddSearchListner = () => {
   let location_input = document.getElementById("location_input");
   location_input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       let location_search = location_input.value;
-      fetch(
-        `${api.base}weather?q=${location_search}&units=metric&appid=${api.key}`
-      )
-        .then((res) => res.json())
-        .then((result) => {
-          weather = { ...result };
-          fill_data(weather);
-
-          console.log(result);
-        });
+      getWeatherData(location_search);
     }
   });
 };
 
-const ready = () => {
+const firstCall = () => {
   fetch("https://geolocation-db.com/json/" + api.location_api)
     .then((res) => res.json())
     .then((result) => {
       console.log(result);
-      fetch(`${api.base}weather?q=${result.city}&units=metric&appid=${api.key}`)
-        .then((res) => res.json())
-        .then((result) => {
-          weather = { ...result };
-          fill_data(weather);
-          console.log(result);
-        });
+      getWeatherData(result.city);
+     
     });
 };
 
